@@ -1,0 +1,81 @@
+from tkinter import *
+from tkinter import ttk
+from googletrans import Translator
+from tkinter import Tk, Frame, Menu
+
+def translate():
+    for language, suffix in languages.items():
+        if comboTwo.get() == language:
+            text = t_input.get('1.0', END)
+            translation = translator.translate(text, dest=suffix)
+            t_output.delete('1.0', END)
+            t_output.insert('1.0', translation.text)
+
+def copy():
+    t_input.clipboard_clear()  # Очистить буфер обмена
+    t_input.clipboard_append(t_input.get(1.0, END))  # Скопировать текст в буфер обмена
+
+def past():
+    clipboard_text = root.clipboard_get()
+    t_input.insert('1.0', clipboard_text)
+
+def cut():
+    t_input.clipboard_clear()  # Очистить буфер обмена
+    t_input.clipboard_append(t_input.get(1.0, END))  # Скопировать текст в буфер обмена
+    t_input.delete(1.0, END)
+
+def showMenu(e):
+    global x, y
+    x = e.x
+    y = e.y
+    menu.post(e.x_root, e.y_root)
+
+x = 0
+y = 0
+
+root = Tk()
+root.geometry('500x350')
+root.title('Переводчик')
+root.resizable(width=False, height=False)
+root['bg'] = 'black'
+
+translator = Translator()
+languages = {'Русский': 'ru', 'Английский': 'en', 'Французский': 'fr'}
+
+root.bind("<Button-3>", showMenu)
+menu = Menu(tearoff=0)
+menu.add_command(label="Копировать", command=copy)
+menu.add_command(label="Вставить", command=past)
+menu.add_command(label="Вырезать", command=cut)
+
+header_frame = Frame(root, bg='black')
+header_frame.pack(fill=X)
+
+header_frame.grid_columnconfigure(0, weight=1)
+header_frame.grid_columnconfigure(1, weight=1)
+header_frame.grid_columnconfigure(2, weight=1)
+
+comboOne = ttk.Combobox(header_frame,
+                        values=[lang for lang in languages], state='readonly')
+comboOne.current(0)
+comboOne.grid(row=0, column=0)
+
+label = Label(header_frame, fg='white', bg='black', font='Arial 17 bold', text='->')
+label.grid(row=0, column=1)
+
+comboTwo = ttk.Combobox(header_frame,
+                        values=[lang for lang in languages], state='readonly')
+comboTwo.current(1)
+comboTwo.grid(row=0, column=2)
+
+t_input = Text(root, width=35, height=5, font='Arial 12 bold')
+t_input.pack(pady=20)
+
+btn = Button(root, text='Перевести', command=translate)
+btn.pack()
+
+t_output = Text(root, width=35, height=5, font='Arial 12 bold')
+t_output.pack(pady=20)
+
+
+root.mainloop()
